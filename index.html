@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Sales Manager</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1e90ff;
+            --secondary-color: #2c3e50;
+            --accent-color: #3498db;
+            --background-dark: #121212;
+            --text-light: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 80px;
+            background-color: #1f2937;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            transition: width 0.3s;
+        }
+
+        .sidebar:hover {
+            width: 250px;
+        }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 15px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-btn i {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #1e2432;
+        }
+
+        .cyber-card {
+            background-color: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            background-color: #34495e;
+            border: none;
+            color: var(--text-light);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .cyber-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .cyber-btn:hover {
+            transform: scale(1.05);
+        }
+
+        #salesTable {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #2c3e50;
+        }
+
+        #salesTable th {
+            background-color: #34495e;
+            color: var(--text-light);
+            padding: 10px;
+            text-align: left;
+        }
+
+        #salesTable td {
+            padding: 10px;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .receipt-preview {
+            background-color: white;
+            color: black;
+            padding: 20px;
+            max-width: 400px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .download-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+
+        #watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 50px;
+            color: rgba(0,0,0,0.1);
+            z-index: 1;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .currency-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .currency-toggle button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #34495e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .currency-toggle button.active {
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="#" class="sidebar-btn" data-section="dashboard">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="receipt">
+            <i class="fas fa-receipt"></i>
+            <span>Generate Receipt</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="sales">
+            <i class="fas fa-shopping-cart"></i>
+            <span>View Sales</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="profit">
+            <i class="fas fa-dollar-sign"></i>
+            <span>Profit Calculator</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="login">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="signup">
+            <i class="fas fa-user-plus"></i>
+            <span>Sign Up</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="signout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sign Out</span>
+        </a>
+        <a href="#" class="sidebar-btn" data-section="personal-sales" id="personal-sales-btn" style="display: none;">
+            <i class="fas fa-user-tag"></i>
+            <span>Personal Sales</span>
+        </a>
+
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard" class="cyber-card">
+            <h2>Sales Dashboard</h2>
+            <div id="dashboardStats">
+                <p>Total Sales: <span id="totalSalesAmount">$0</span></p>
+                <p>Total Products Sold: <span id="totalProductsSold">0</span></p>
+            </div>
+        </div>
+
+        <div id="receipt" class="cyber-card" style="display:none;">
+            <h2>Generate Receipt</h2>
+            
+            <div class="currency-toggle">
+                <button onclick="setCurrency('USD')" class="active">USD ($)</button>
+                <button onclick="setCurrency('KES')">KES (Ksh)</button>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="companyName" placeholder="Company Name" required>
+                <input type="text" id="productName" placeholder="Product Name" required>
+                <input type="number" id="quantity" placeholder="Quantity" required>
+                <input type="number" id="unitPrice" placeholder="Unit Price" required>
+                <button class="cyber-btn" onclick="generateReceipt()">Generate Receipt</button>
+            </div>
+            <div id="receiptPreview" class="receipt-preview">
+                <div id="watermark"></div>
+                <div id="receiptContent"></div>
+                <button class="download-btn" onclick="downloadReceiptAsPNG()" style="display:none;">
+                    Download Receipt
+                </button>
+            <button class="share-btn" onclick="shareReceiptOnWhatsApp()" style="display:none;">
+                <i class="fab fa-whatsapp"></i> Share on WhatsApp
+            </button>
+            <script>
+                function shareReceiptOnWhatsApp() {
+                    // Get the receipt content
+                    const receiptContent = document.getElementById('receiptContent');
+                    
+                    // Create sharing text
+                    const companyName = document.getElementById('companyName').value;
+                    const productName = document.getElementById('productName').value;
+                    const quantity = document.getElementById('quantity').value;
+                    const unitPrice = document.getElementById('unitPrice').value;
+                    const total = quantity * unitPrice;
+                    
+                    // Format the message
+                    const message = `Receipt from ${companyName}%0A
+Product: ${productName}%0A
+Quantity: ${quantity}%0A
+Unit Price: ${unitPrice}%0A
+Total: ${total}`;
+                    
+                    // Create WhatsApp sharing URL
+                    const whatsappURL = `https://wa.me/?text=${Thank}`;
+                    
+                
+                    // Open in new window
+                    window.open(whatsappURL, '_blank');
+                }
+                
+                // Show share button when receipt is generated
+                const downloadBtn = document.querySelector('.download-btn');
+                const shareBtn = document.querySelector('.share-btn');
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'style') {
+                            shareBtn.style.display = downloadBtn.style.display;
+                        }
+                    });
+                });
+                observer.observe(downloadBtn, { attributes: true });
+            </script>
+
+            </div>
+        </div>
+
+        <div id="sales" class="cyber-card" style="display:none;">
+            <h2>Sales History</h2>
+            <table id="salesTable" style="background-color: red;">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Total Sales</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="profit" class="cyber-card" style="display:none;">
+            <h2>Profit & Loss Calculator</h2>
+            <div class="input-group">
+                <input type="text" id="profitProductName" placeholder="Product Name">
+                <input type="number" id="buyingPrice" placeholder="Buying Price">
+                <input type="number" id="sellingPrice" placeholder="Selling Price">
+                <input type="number" id="incurredCost" placeholder="Incurred Cost">
+                <button class="cyber-btn" onclick="calculateProfit()">Calculate Profit</button>
+            </div>
+            <div id="profitResult"></div>
+        </div>
+        <div id="loginModal" class="modal" style="display:none;">
+            <div class="modal-content cyber-card">
+                <span class="close" onclick="closeModal('loginModal')">&times;</span>
+                <h2>Login</h2>
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button class="cyber-btn" onclick="login()">Login</button>
+                </div>
+            </div>
+        <div id="personalSalesModal" class="modal" style="display:none;">
+            <div class="modal-content cyber-card">
+                <span class="close" onclick="closeModal('personalSalesModal')">&times;</span>
+                <h2>Personal Sales Inventory</h2>
+                <div class="input-group">
+                    <input type="text" id="productName" placeholder="Product Name" required>
+                    <input type="number" id="inventoryBuyingPrice" placeholder="Buying Price" required>
+                    <input type="number" id="expectedSellingPrice" placeholder="Expected Selling Price" required>
+                    <button class="cyber-btn" onclick="saveInventoryItem()">Add Item</button>
+                </div>
+
+                <div class="inventory-list">
+                    <h3>Current Inventory</h3>
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Buying Price</th>
+                                <th>Expected Selling Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                    <button class="cyber-btn" onclick="downloadInventoryPDF()">Download as PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let inventoryItems = [];
+
+            function saveInventoryItem() {
+                const productName = document.getElementById('productName').value;
+                const buyingPrice = document.getElementById('inventoryBuyingPrice').value;
+                const sellingPrice = document.getElementById('expectedSellingPrice').value;
+
+                if (!productName || !buyingPrice || !sellingPrice) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                const item = {
+                    productName,
+                    buyingPrice: parseFloat(buyingPrice),
+                    sellingPrice: parseFloat(sellingPrice)
+                };
+
+                inventoryItems.push(item);
+                updateInventoryTable();
+                clearInventoryForm();
+            }
+
+            function updateInventoryTable() {
+                const tbody = document.getElementById('inventoryTableBody');
+                tbody.innerHTML = '';
+
+                inventoryItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.productName}</td>
+                        <td>${item.buyingPrice}</td>
+                        <td>${item.sellingPrice}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            function clearInventoryForm() {
+                document.getElementById('productName').value = '';
+                document.getElementById('inventoryBuyingPrice').value = '';
+                document.getElementById('expectedSellingPrice').value = '';
+            }
+
+            function downloadInventoryPDF() {
+                const doc = new jsPDF();
+                doc.text('Inventory List', 20, 10);
+
+                const columns = ['Product Name', 'Buying Price', 'Expected Selling Price'];
+                const data = inventoryItems.map(item => [
+                    item.productName,
+                    item.buyingPrice.toString(),
+                    item.sellingPrice.toString()
+                ]);
+
+                doc.autoTable({
+                    head: [columns],
+                    body: data,
+                    startY: 20
+                });
+
+                doc.save('inventory.pdf');
+            }
+        </script>
+        </div>
+
+        <div id="signupModal" class="modal" style="display:none;">
+            <div class="modal-content cyber-card">
+                <span class="close" onclick="closeModal('signupModal')">&times;</span>
+                <h2>Sign Up</h2>
+                <div class="input-group">
+                    <input type="text" id="signupName" placeholder="Full Name" required>
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                    <input type="password" id="signupPassword" placeholder="Password" required>
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                    <button class="cyber-btn" onclick="signup()">Sign Up</button>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                z-index: 1000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-content {
+                position: relative;
+                width: 90%;
+                max-width: 500px;
+                padding: 20px;
+                border-radius: 8px;
+            }
+
+            .close {
+                position: absolute;
+                right: 20px;
+                top: 10px;
+                font-size: 28px;
+                cursor: pointer;
+            }
+
+            .close:hover {
+                color: #ff0000;
+            }
+
+            .modal .input-group {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .modal input {
+                padding: 10px;
+                border: 1px solid #30ffd0;
+                background: rgba(0,0,0,0.1);
+                color: #fff;
+                border-radius: 4px;
+            }
+
+            .modal input:focus {
+                outline: none;
+                border-color: #00ff9d;
+                box-shadow: 0 0 5px rgba(0,255,157,0.5);
+            }
+        </style>
+    </div>
+
+    <script>
+        // Global Variables
+        let salesData = [];
+        let currentCurrency = 'USD';
+        let prices = {
+            USD: { symbol: '$', value: 0 },
+            KES: { symbol: 'Ksh', value: 0 }
+        };
+
+        // Section Navigation
+        document.querySelectorAll('.sidebar-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const sectionId = this.getAttribute('data-section');
+                document.querySelectorAll('.main-content > div').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+            });
+        });
+
+        function setCurrency(currency) {
+            currentCurrency = currency;
+            document.querySelectorAll('.currency-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update placeholder to show correct currency
+            const unitPriceInput = document.getElementById('unitPrice');
+            unitPriceInput.placeholder = `Unit Price (${currency})`;
+            
+            // Clear the unit price input when switching currencies
+            unitPriceInput.value = '';
+        }
+
+        function formatAmount(amount) {
+            const currencyInfo = {
+                USD: { symbol: '$', decimals: 2 },
+                KES: { symbol: 'Ksh', decimals: 0 }
+            };
+            
+            const { symbol, decimals } = currencyInfo[currentCurrency];
+            return `${symbol} ${amount.toFixed(decimals)}`;
+        }
+
+        function generateReceipt() {
+            const companyName = document.getElementById('companyName').value;
+            const productName = document.getElementById('productName').value;
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value);
+            const totalSales = quantity * unitPrice;
+            const currentDate = new Date().toLocaleDateString();
+
+            // Validate inputs
+            if (!companyName || !productName || !quantity || !unitPrice) {
+                alert('Please fill in all fields');
+                return;
+
+            }
+
+            // Update watermark
+            document.getElementById('watermark').textContent = companyName;
+
+            const receiptHtml = `
+                <h3>${companyName} Receipt</h3>
+                <p>Product: ${productName}</p>
+                <p>Quantity: ${quantity}</p>
+                <p>Unit Price: ${formatAmount(unitPrice)}</p>
+                <p>Total: ${formatAmount(totalSales)}</p>
+                <p>Date: ${currentDate}</p>
+            `;
+
+            // Update receipt content
+            document.getElementById('receiptContent').innerHTML = receiptHtml;
+
+            // Show download button
+            document.querySelector('.download-btn').style.display = 'block';
+
+            // Store sales data
+            salesData.push({
+                productName,
+                quantity,
+                totalSales
+            });
+
+            updateSalesTable();
+            updateDashboard();
+        }
+
+        function updateSalesTable() {
+            const tableBody = document.getElementById('salesTableBody');
+            tableBody.innerHTML = '';
+            salesData.forEach(sale => {
+                const row = `
+                    <tr>
+                        <td>${sale.productName}</td>
+                        <td>${sale.quantity}</td>
+                        <td>${formatAmount(sale.totalSales)}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function updateDashboard() {
+            const totalSales = salesData.reduce((sum, sale) => sum + sale.totalSales, 0);
+            const totalProducts = salesData.reduce((sum, sale) => sum + sale.quantity, 0);
+
+            document.getElementById('totalSalesAmount').textContent = formatAmount(totalSales);
+            document.getElementById('totalProductsSold').textContent = totalProducts;
+        }
+
+        function downloadReceiptAsPNG() {
+            // Use html2canvas to convert receipt to image
+            const receiptElement = document.getElementById('receiptPreview');
+            
+            html2canvas(receiptElement, {
+                scale: 2, // Increases resolution
+                backgroundColor: 'white' // Ensures white background
+            }).then(canvas => {
+                // Create a link element to download the image
+                const link = document.createElement('a');
+                link.download = `receipt_${new Date().toISOString().slice(0,10)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function calculateProfit() {
+            const productName = document.getElementById('profitProductName').value;
+            const buyingPrice = parseFloat(document.getElementById('buyingPrice').value);
+            const sellingPrice = parseFloat(document.getElementById('sellingPrice').value);
+            const incurredCost = parseFloat(document.getElementById('incurredCost').value);
+
+            // Validate inputs
+            if (!productName || !buyingPrice || !sellingPrice || !incurredCost) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const profit = (sellingPrice - buyingPrice - incurredCost);
+            const profitStatus = profit > 0 ? 'Profit' : 'Loss';
+
+            const resultHtml = `
+                <h3>Profit Analysis for ${productName}</h3>
+                <p>Buying Price: ${formatAmount(buyingPrice)}</p>
+                <p>Selling Price: ${formatAmount(sellingPrice)}</p>
+                <p>Incurred Cost: ${formatAmount(incurredCost)}</p>
+                <p>Total ${profitStatus}: ${formatAmount(Math.abs(profit))}</p>
+            `;
+
+            document.getElementById('profitResult').innerHTML = resultHtml;
+        }
+        
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/admin/";
+        });
+      }
+    });
+    if (window.netlifyIdentity) {
+  window.netlifyIdentity.on("init", user => {
+    if (user) {
+      // User is logged in
+      document.querySelector(".logged-in-content").style.display = "block";
+      document.querySelector(".logged-out-content").style.display = "none";
+    } else {
+      // User is logged out
+      document.querySelector(".logged-in-content").style.display = "none";
+      document.querySelector(".logged-out-content").style.display = "block";
+    }
+  });
+    }
+
+  }
+        // Login/Signup Modal Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Add click handlers for login/signup buttons
+        document.querySelector('[data-section="login"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal('loginModal');
+        });
+
+        document.querySelector('[data-section="signup"]').addEventListener('click', (e) => {
+            e.preventDefault(); 
+            showModal('signupModal');
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Handle login form submission
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                await netlifyIdentity.login({
+                    email: email,
+                    password: password
+                });
+                closeModal('loginModal');
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        }
+
+        // Handle signup form submission  
+        async function signup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            try {
+                await netlifyIdentity.signup({
+                    email: email,
+                    password: password,
+                    user_metadata: {
+                        full_name: name
+                    }
+                });
+                closeModal('signupModal');
+                alert('Signup successful! Please check your email to confirm your account.');
+            } catch (error) {
+                alert('Signup failed: ' + error.message);
+            }
+        }
+        // Handle sign out
+        async function signout() {
+            try {
+                await netlifyIdentity.logout();
+                // Redirect to dashboard or home page after signout
+                document.querySelectorAll('.main-content > div').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById('dashboard').style.display = 'block';
+            } catch (error) {
+                alert('Sign out failed: ' + error.message);
+            }
+        }
+
+
+    </script>
+</body>
+</html>
